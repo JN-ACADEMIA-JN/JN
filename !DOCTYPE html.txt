@@ -1,0 +1,1107 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Academia JN - Clases Particulares</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;800&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'primary': '#0d9488', // Teal 600 - Color "Cool" principal (Teal/Verde Azulado)
+                        'secondary': '#9333ea', // ACENTO FRÍO: Violet 600 - Morado vibrante
+                        'light-bg': '#f0f9ff', // Azul Cielo 50 - Fondo principal claro y limpio
+                        'card-bg': '#ffffff', // Fondo de tarjetas
+                        'dark-text': '#1f2937', // Texto principal (Gris oscuro)
+                    },
+                    fontFamily: {
+                        sans: ['Manrope', 'sans-serif'], // Fuente principal relajada
+                    },
+                }
+            }
+        }
+    </script>
+    <style>
+        /* CSS Base para MODO CLARO UNIFICADO */
+        body {
+            /* REAJUSTE PARA MÓVILES: El cuerpo se expande con el contenido. Elimina 'min-height: 100vh' para evitar recortes en la parte inferior. */
+            background-color: var(--light-bg);
+            padding-top: 20px; 
+            padding-bottom: 20px; 
+            color: var(--dark-text); 
+            transition: background-color 0.3s, color 0.3s;
+        }
+        
+        .card {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); /* Sombra suave pero visible */
+            background-color: var(--card-bg);
+        }
+        
+        /* Contenedor de Marcas de Agua PRINCIPAL (fondo del body) */
+        .watermark-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            pointer-events: none;
+            opacity: 0.1; 
+            z-index: 0;
+            font-family: cursive, sans-serif; 
+            color: #4db6ac; /* Un teal más claro para el fondo */
+        }
+
+        .watermark-bg::before, .watermark-bg::after {
+            content: '';
+            position: absolute;
+            white-space: nowrap;
+            font-size: 3rem;
+            font-weight: bold;
+            transform-origin: 0 0;
+        }
+
+        .watermark-bg::before {
+            content: '∫ d(x) = Mates ∞';
+            top: 10%;
+            left: -10%;
+            transform: rotate(-25deg);
+        }
+
+        .watermark-bg::after {
+            content: 'P*Q = Oferta + Demanda | Debe/Haber';
+            bottom: 5%;
+            right: -10%;
+            transform: rotate(15deg);
+        }
+        
+        /* Estilo para la imagen del logo (Aumentado a 120px) */
+        .logo-img {
+            width: 120px; 
+            height: auto;
+            border-radius: 15px; 
+            margin-right: 1.5rem; /* Aumentado el margen */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            background-color: transparent; 
+            padding: 0; 
+        }
+
+        /* Estilos específicos para texto y enlaces en modo claro */
+        h1, h2, h3 { color: #1f2937; } 
+        .text-gray-300 { color: #6b7280; } 
+        .whatsapp-btn { background-color: #10b981; } 
+
+        /* Nuevo estilo para las marcas de agua del encabezado */
+        .header-watermark-bg {
+            position: absolute; 
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            pointer-events: none; 
+            opacity: 0.1; /* Opacidad aumentada */
+            z-index: 1; 
+            font-family: cursive, sans-serif; 
+            color: #000000; /* Color negro */
+        }
+        
+        /* Estilo base para cada marca de agua individual */
+        .watermark-item {
+            position: absolute;
+            white-space: nowrap;
+            font-size: 1.2rem; /* Tamaño de fuente para que no sea muy grande */
+            font-weight: bold;
+        }
+
+        /* Estilos para el desplegable de temas de AREA (Primer nivel) */
+        .topics-list-container {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out, padding 0.3s ease-out;
+            padding-top: 0;
+        }
+
+        .topics-list-container.open {
+            max-height: 1000px; /* Suficientemente grande para el contenido anidado */
+            padding-top: 1rem;
+        }
+
+        /* Estilo para el botón de Área (para que parezca interactivo) */
+        .area-header {
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid transparent;
+            transition: border-color 0.3s;
+        }
+        
+        .area-header:hover {
+            border-bottom-color: #e5e7eb; /* Gris claro al pasar el mouse */
+        }
+        
+        .arrow-icon {
+            transition: transform 0.3s ease;
+        }
+        
+        .area-header.open .arrow-icon, .module-header.open .arrow-icon {
+            transform: rotate(180deg);
+        }
+        
+        /* NUEVOS ESTILOS PARA MÓDULOS (Segundo nivel, ej: Cálculo I) */
+        .module-header {
+            cursor: pointer;
+            padding: 0.75rem 1rem;
+            margin-bottom: 0.5rem;
+            border-radius: 0.75rem;
+            background-color: #f0fdf4; /* Verde muy claro para módulos */
+            font-weight: 700;
+            color: #059669; /* Verde oscuro */
+            border: 1px solid #d1fae5;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: background-color 0.2s, transform 0.1s;
+        }
+
+        .module-header:hover {
+            background-color: #e0f2f1;
+            transform: translateY(-1px);
+        }
+        
+        .module-topics-container {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out, padding 0.3s ease-out;
+            padding-top: 0;
+            padding-left: 1rem; /* Indentation for topics */
+            border-left: 2px solid #a7f3d0; /* Light green line */
+        }
+
+        .module-topics-container.open {
+            max-height: 800px; /* Suficiente para todos los temas */
+            padding-top: 0.5rem;
+            padding-bottom: 0.5rem;
+        }
+
+        /* Estilo para los botones de Material (Tercer nivel) */
+        .topic-button {
+            width: 100%;
+            text-align: left;
+            padding: 0.5rem 0.75rem;
+            margin-top: 0.25rem;
+            border-radius: 0.5rem;
+            background-color: #f7f9fd; /* Fondo sutil para botones */
+            color: #1f2937;
+            font-weight: 600;
+            transition: background-color 0.2s, transform 0.1s;
+        }
+        
+        .topic-button:hover {
+            background-color: #e0f2f1; /* Teal 100 */
+            transform: translateY(-1px);
+        }
+
+        /* Estilo para el mensaje de material (Modal simple) */
+        #material-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        
+        .modal-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 1rem;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            transform: scale(0.95);
+            animation: bounceIn 0.3s forwards;
+        }
+
+        @keyframes bounceIn {
+            from { opacity: 0; transform: scale(0.7); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        
+        .modal-close-btn {
+            background-color: #9333ea;
+            transition: background-color 0.2s;
+        }
+        
+        .modal-close-btn:hover {
+            background-color: #7e22ce;
+        }
+    </style>
+</head>
+<body class="bg-light-bg text-dark-text font-sans">
+    
+    <div class="watermark-bg"></div>
+
+    <div id="app-container" class="w-full max-w-4xl mx-auto p-4 sm:p-6 lg:p-8 relative z-10">
+
+        <div class="flex justify-end space-x-4 mb-6 text-gray-700">
+            <button id="lang-toggle" onclick="toggleLanguage()" class="flex items-center p-2 rounded-full hover:bg-gray-200 transition duration-150">
+                <span id="current-lang-text">EN</span>
+                <svg class="w-5 h-5 ml-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path d="M7 2a1 1 0 011 1v1h2V3a1 1 0 112 0v1h1a1 1 0 011 1v1h2a1 1 0 011 1v7a1 1 0 01-1 1h-2v2h-1v-2H8v2H7v-2H5a1 1 0 01-1-1V8a1 1 0 011-1h2V6H5a1 1 0 01-1-1V3a1 1 0 011-2h1a1 1 0 011 1v1zm1 2h2V3a1 1 0 11-2 0v1zm-2 2h6v2H6V6z"/></svg>
+            </button>
+        </div>
+
+        <header class="text-center mb-10 flex flex-col items-center justify-center bg-white p-6 rounded-2xl shadow-lg relative">
+            <div id="header-watermark-bg" class="header-watermark-bg">
+                <!-- Las marcas de agua cortas serán inyectadas aquí por JavaScript -->
+            </div>
+
+            <div class="flex items-center justify-center mb-2 relative z-20">
+                <img src="uploaded:image_75cb00.jpg-6267fef1-a99e-43db-8944-50db9ab1682f" 
+                     alt="Logo Academia JN" 
+                     onerror="this.onerror=null;this.src='https://placehold.co/120x120/f97316/000000?text=JN';"
+                     class="logo-img"> 
+                <h1 class="text-5xl font-extrabold text-primary sm:text-6xl tracking-tight" data-text-key="title">
+                    Academia JN
+                </h1>
+            </div>
+            <p class="mt-2 text-xl text-gray-600 font-medium relative z-20" data-text-key="subtitle">
+                Clases personalizada para el éxito escolar - académico.
+            </p>
+        </header>
+
+        <div id="motivational-phrase-container" class="text-center mb-8 p-8 md:p-12 rounded-2xl bg-white shadow-xl border border-gray-100 transform hover:scale-[1.01] transition duration-300">
+            <p id="phrase-text" class="text-4xl sm:text-5xl md:text-6xl text-gray-900 leading-tight font-semibold tracking-tight">
+                Cargando frase...
+            </p>
+
+            <footer id="phrase-author" class="mt-8 text-xl text-gray-500 font-light">
+            </footer>
+        </div>
+
+
+        <section class="mb-10 text-center">
+            <div class="inline-flex items-center bg-white p-4 rounded-xl shadow-lg border border-gray-200">
+                <svg class="w-8 h-8 text-primary mr-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.747 0-3.332.477-4.5 1.253" />
+                </svg>
+                <p class="text-lg font-semibold text-gray-800" data-text-key="ubaCredential">
+                    Somos profesionales formados en la Facultad de Ciencias Económicas de la UBA.
+                </p>
+            </div>
+        </section>
+
+        <!-- SECCIÓN DE ENSEÑANZA CON ACORDEÓN -->
+        <section class="mb-12">
+            <h2 class="text-2xl font-semibold text-dark-text mb-6 border-b-2 border-primary/20 pb-2" data-text-key="areaTitle">
+                Nuestras Áreas de Enseñanza
+            </h2>
+            <div id="specialties-grid" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                
+                <!-- Matemáticas Card -->
+                <div id="card-math" class="card p-6 rounded-xl border border-yellow-400/30 transform transition duration-300 hover:scale-[1.01] hover:shadow-xl" data-area-id="math">
+                    <div onclick="handleAreaClick('math')" class="area-header" role="button" aria-expanded="false" aria-controls="topics-math">
+                        <div class="flex items-center">
+                            <div class="specialty-icon flex items-center justify-center bg-yellow-400/70 text-black rounded-full mr-4 w-10 h-10 shadow-md">
+                                <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 12H5"/><path d="M14.5 7h4"/><path d="M20 20l-4.5-5.5L20 9"/><path d="M12 20V4"/></svg>
+                            </div>
+                            <h3 class="text-xl font-bold text-gray-900" data-text-key="mathTitle">Matemáticas</h3>
+                        </div>
+                        <svg class="w-5 h-5 text-primary arrow-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
+                    </div>
+                    <!-- CONTENIDO PLEGABLE -->
+                    <div id="topics-math" class="topics-list-container">
+                        <!-- Temas/Módulos generados por JS -->
+                    </div>
+                </div>
+
+                <!-- Microeconomía Card -->
+                <div id="card-micro" class="card p-6 rounded-xl border border-orange-400/30 transform transition duration-300 hover:scale-[1.01] hover:shadow-xl" data-area-id="micro">
+                    <div onclick="handleAreaClick('micro')" class="area-header" role="button" aria-expanded="false" aria-controls="topics-micro">
+                        <div class="flex items-center">
+                            <div class="specialty-icon flex items-center justify-center bg-orange-400/70 text-black rounded-full mr-4 w-10 h-10 shadow-md">
+                                <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M18.7 8.3L13 14 9.1 10.1 6 13"/></svg>
+                            </div>
+                            <h3 class="text-xl font-bold text-gray-900" data-text-key="microTitle">Microeconomía</h3>
+                        </div>
+                        <svg class="w-5 h-5 text-primary arrow-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
+                    </div>
+                    <!-- CONTENIDO PLEGABLE -->
+                    <div id="topics-micro" class="topics-list-container">
+                        <!-- Temas generados por JS -->
+                    </div>
+                </div>
+                
+                <!-- Macroeconomía Card -->
+                <div id="card-macro" class="card p-6 rounded-xl border border-cyan-400/30 transform transition duration-300 hover:scale-[1.01] hover:shadow-xl" data-area-id="macro">
+                    <div onclick="handleAreaClick('macro')" class="area-header" role="button" aria-expanded="false" aria-controls="topics-macro">
+                        <div class="flex items-center">
+                            <div class="specialty-icon flex items-center justify-center bg-cyan-400/70 text-black rounded-full mr-4 w-10 h-10 shadow-md">
+                                <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="14" width="8" height="6" rx="1"/><rect x="14" y="8" width="8" height="12" rx="1"/><path d="M10 4.5v15"/><path d="M10 7H4"/><path d="M20 7H14"/></svg>
+                            </div>
+                            <h3 class="text-xl font-bold text-gray-900" data-text-key="macroTitle">Macroeconomía</h3>
+                        </div>
+                        <svg class="w-5 h-5 text-primary arrow-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
+                    </div>
+                    <!-- CONTENIDO PLEGABLE -->
+                    <div id="topics-macro" class="topics-list-container">
+                        <!-- Temas generados por JS -->
+                    </div>
+                </div>
+
+                <!-- Contabilidad Card -->
+                <div id="card-account" class="card p-6 rounded-xl border border-violet-400/30 transform transition duration-300 hover:scale-[1.01] hover:shadow-xl" data-area-id="account">
+                    <div onclick="handleAreaClick('account')" class="area-header" role="button" aria-expanded="false" aria-controls="topics-account">
+                        <div class="flex items-center">
+                            <div class="specialty-icon flex items-center justify-center bg-violet-400/70 text-black rounded-full mr-4 w-10 h-10 shadow-md">
+                                <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12a10 10 0 0 1 18-4"/><path d="M22 12a10 10 0 0 0-18 4"/><path d="M8 7l4-4 4 4"/><path d="M16 17l-4 4-4-4"/></svg>
+                            </div>
+                            <h3 class="text-xl font-bold text-gray-900" data-text-key="accountTitle">Contabilidad</h3>
+                        </div>
+                        <svg class="w-5 h-5 text-primary arrow-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
+                    </div>
+                    <!-- CONTENIDO PLEGABLE -->
+                    <div id="topics-account" class="topics-list-container">
+                        <!-- Temas generados por JS -->
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- FIN SECCIÓN DE ENSEÑANZA CON ACORDEÓN -->
+
+        <section class="mb-12 bg-white p-8 rounded-xl card border border-gray-200">
+            <h2 class="text-2xl font-semibold text-gray-800 mb-6 border-b-2 border-gray-200 pb-2" data-text-key="formTitle">
+                Solicita tu Clase o Consulta
+            </h2>
+            <form id="contact-form" class="space-y-4">
+                <div>
+                    <label for="name" class="block text-sm font-medium text-gray-700" data-text-key="formNameLabel">Tu Nombre Completo</label>
+                    <input type="text" id="name" name="name" required
+                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary p-2.5 transition duration-150 text-dark-text">
+                </div>
+                
+                <div>
+                    <label for="topic" class="block text-sm font-medium text-gray-700" data-text-key="formTopicLabel">Tema/Materia que Necesitas</label>
+                    <select id="topic" name="topic" required
+                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary p-2.5 transition duration-150 text-dark-text">
+                        <option value="" data-text-key="selectOption">Selecciona una opción</option>
+                        <option value="matematicas" data-text-key="topicMath">Matemáticas</option>
+                        <option value="microeconomia" data-text-key="topicMicro">Microeconomía</option>
+                        <option value="macroeconomia" data-text-key="topicMacro">Macroeconomía</option>
+                        <option value="contabilidad" data-text-key="topicAccount">Teoría Contable</option>
+                        <option value="otro" data-text-key="topicOther">Otro (Especificar en mensaje)</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label for="difficulty" class="block text-sm font-medium text-gray-700" data-text-key="formLevelLabel">Mi nivel es:...</label>
+                    <select id="difficulty" name="difficulty" required
+                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary p-2.5 transition duration-150 text-dark-text">
+                        <option value="" data-text-key="selectLevel">Selecciona el nivel</option>
+                        <option value="primario" data-text-key="levelPrimary">Primario</option>
+                        <option value="secundario" data-text-key="levelSecondary">Secundario</option>
+                        <option value="terciario" data-text-key="levelTertiary">Terciario</option>
+                        <option value="universitario" data-text-key="levelUniversity">Universitario</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label for="message" class="block text-sm font-medium text-gray-700" data-text-key="formMessageLabel">Mensaje y Detalles Adicionales</label>
+                    <textarea id="message" name="message" rows="4" required
+                              class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary p-2.5 transition duration-150 text-dark-text"
+                              data-text-key="formMessagePlaceholder" placeholder="Ej: Necesito ayuda con 'Integrales Definidas'."></textarea>
+                </div>
+                <button type="submit"
+                        class="w-full py-3 text-lg font-bold text-white bg-secondary hover:bg-violet-700 rounded-xl transition duration-150 ease-in-out transform hover:scale-[1.01] active:scale-95 focus:outline-none focus:ring-4 focus:ring-secondary/50">
+                    <span data-text-key="sendButton">Enviar Solicitud</span>
+                </button>
+            </form>
+            
+            <div id="status-message" class="mt-4 p-3 rounded-lg hidden text-center font-medium"></div>
+        </section>
+
+        <section class="mb-10 bg-indigo-50 p-8 rounded-xl card border-2 border-primary/50">
+            <h2 class="text-2xl font-semibold text-gray-800 mb-4 text-center" data-text-key="promoTitle">
+                Tu Código Promoción
+            </h2>
+            <p class="text-gray-600 text-center mb-4" data-text-key="promoDesc">
+                Ingresa este código para aplicar tu descuento o promoción.
+            </p>
+            <div id="student-code-display" class="bg-white p-4 rounded-lg border-4 border-dashed border-primary/50 text-center text-4xl font-mono font-bold text-primary cursor-pointer transition duration-150 hover:bg-primary/10" title="Click para copiar">
+                Cargando...
+            </div>
+            
+            <p id="copy-message" class="text-center text-sm text-green-600 mt-2 hidden" data-text-key="copySuccess">¡Código copiado!</p>
+        </section>
+
+        <footer class="text-center mt-10 text-gray-500 text-sm border-t pt-6">
+            <p class="mb-4 text-dark-text font-semibold text-base" data-text-key="contactTitle">Contactos Directos (WhatsApp):</p>
+            <div class="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-6 mb-4">
+                
+                <a id="wa-julio" href="" target="_blank" class="whatsapp-btn flex items-center justify-center p-3 rounded-xl text-white font-bold transition duration-150 hover:bg-green-600 shadow-md">
+                    <svg class="w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12c0 3.12 1.34 5.94 3.48 7.82l-1.42 1.42c-.2.2-.2.51 0 .71s.51.2.71 0l1.42-1.42C8.06 21.66 10.88 23 14 23c5.52 0 10-4.48 10-10C24 6.48 19.52 2 12 2zm3.87 14.59c-.27-.13-1.61-.79-1.86-.88-.26-.1-.44-.15-.62.15s-.71.88-.87 1.06-.32.2-.59.08c-.26-.13-1.07-.39-2.03-1.25s-1.59-2.12-1.78-2.43c-.19-.32-.02-.49.13-.61.15-.12.32-.32.48-.48.16-.16.22-.27.32-.45.1-.19.05-.35-.02-.48-.07-.13-.62-.31-1.2-.55-.58-.24-1.12-.44-1.2-.47-.07-.03-.16-.03-.22-.03-.06 0-.12.02-.19.09-.07.07-.27.34-.27.83s.27.96.39 1.09.25.19.43.43.37.49.56.71.39.46.59.61c.18.14.36.25.56.33.19.09.4.17.65.25.2.06.39.06.54.04s.44-.17.58-.33c.14-.17.26-.33.39-.52.13-.19.26-.37.36-.55.09-.17.18-.3.35-.41.17-.11.36-.18.57-.25.2-.07.39-.1.59-.1.2 0 .4.07.57.25.17.17.65.79.65.92 0 .14-.07.27-.16.4-.09.13-.19.22-.3.33-.12.1-.23.19-.34.33-.11.14-.23.33-.35.52z"/></svg>
+                    Julio (11-2398-5041)
+                </a>
+                
+                <a id="wa-naty" href="" target="_blank" class="whatsapp-btn flex items-center justify-center p-3 rounded-xl text-white font-bold transition duration-150 hover:bg-green-600 shadow-md">
+                    <svg class="w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12c0 3.12 1.34 5.94 3.48 7.82l-1.42 1.42c-.2.2-.2.51 0 .71s.51.2.71 0l1.42-1.42C8.06 21.66 10.88 23 14 23c5.52 0 10-4.48 10-10C24 6.48 19.52 2 12 2zm3.87 14.59c-.27-.13-1.61-.79-1.86-.88-.26-.1-.44-.15-.62.15s-.71.88-.87 1.06-.32.2-.59.08c-.26-.13-1.07-.39-2.03-1.25s-1.59-2.12-1.78-2.43c-.19-.32-.02-.49.13-.61.15-.12.32-.32.48-.48.16-.16.22-.27.32-.45.1-.19.05-.35-.02-.48-.07-.13-.62-.31-1.2-.55-.58-.24-1.12-.44-1.2-.47-.07-.03-.16-.03-.22-.03-.06 0-.12.02-.19.09-.07.07-.27.34-.27.83s.27.96.39 1.09.25.19.43.43.37.49.56.71.39.46.59.61c.18.14.36.25.56.33.19.09.4.17.65.25.2.06.39.06.54.04s.44-.17.58-.33c.14-.17.26-.33.39-.52.13-.19.26-.37.36-.55.09-.17.18-.3.35-.41.17-.11.36-.18.57-.25.2-.07.39-.1.59-.1.2 0 .4.07.57.25.17.17.65.79.65.92 0 .14-.07.27-.16.4-.09.13-.19.22-.3.33-.12.1-.23.19-.34.33-.11.14-.23.33-.35.52z"/></svg>
+                    Naty (11-2255-6787)
+                </a>
+            </div>
+            <p data-text-key="footerText">Hecho para tus clases particulares. (La información enviada no se almacena, es un ejemplo funcional).</p>
+        </footer>
+        
+        <!-- Modal para Mensajes de Material -->
+        <div id="material-modal" style="display: none;" onclick="closeModal()">
+            <div class="modal-content" onclick="event.stopPropagation()">
+                <h3 class="text-xl font-bold text-secondary mb-3" data-text-key="materialModalTitle">Material Solicitado</h3>
+                <p id="modal-topic-name" class="text-lg font-semibold text-gray-800 mb-2"></p>
+                <p id="modal-material-details" class="text-gray-600 mb-6" data-text-key="materialModalDesc">
+                    Aquí se simula la entrega o visualización del material.
+                </p>
+                <p class="text-sm text-red-500 mb-6" data-text-key="materialSimNote">
+                    (Nota: Esto es solo un ejemplo simulado, el material real se entrega en clase).
+                </p>
+                <button onclick="closeModal()" class="w-full py-2 text-white font-bold rounded-lg modal-close-btn transition duration-150">
+                    <span data-text-key="materialModalClose">Cerrar</span>
+                </button>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        let currentLang = 'es'; // Idioma por defecto
+        
+        // --- DATA DE FRASES MOTIVACIONALES (Aleatorias) ---
+        const phrasesData = {
+            'es': [
+                {
+                    text: 'La creatividad requiere el coraje de <span class="highlighted-word">dejar ir las certezas.</span>',
+                    author: 'Erich Fromm'
+                },
+                {
+                    text: 'La única forma de hacer un gran trabajo es <span class="highlighted-word">amar lo que haces.</span>',
+                    author: 'Steve Jobs'
+                },
+                {
+                    text: 'El éxito es ir de fracaso en fracaso sin perder <span class="highlighted-word">el entusiasmo.</span>',
+                    author: 'Winston Churchill'
+                },
+                {
+                    text: 'El secreto para salir adelante es <span class="highlighted-word">empezar.</span>',
+                    author: 'Mark Twain'
+                },
+                {
+                    text: 'No es la especie más fuerte la que sobrevive, sino la que mejor se <span class="highlighted-word">adapta al cambio.</span>',
+                    author: 'Charles Darwin'
+                }
+            ],
+            'en': [
+                {
+                    text: 'Creativity requires the courage to <span class="highlighted-word">let go of certainty.</span>',
+                    author: 'Erich Fromm'
+                },
+                {
+                    text: 'The only way to do great work is to <span class="highlighted-word">love what you do.</span>',
+                    author: 'Steve Jobs'
+                },
+                {
+                    text: 'Success is going from failure to failure without losing <span class="highlighted-word">enthusiasm.</span>',
+                    author: 'Winston Churchill'
+                },
+                {
+                    text: 'The secret of getting ahead is <span class="highlighted-word">getting started.</span>',
+                    author: 'Mark Twain'
+                },
+                {
+                    text: 'It is not the strongest of the species that survives, but the one that is most <span class="highlighted-word">adaptable to change.</span>',
+                    author: 'Charles Darwin'
+                }
+            ]
+        };
+        
+        // --- DATA PARA MARCAS DE AGUA DEL ENCABEZADO ---
+        const watermarkKeywords = [
+            // Matemáticas
+            'Cálculo', 'Álgebra', 'Integrales', 'Derivadas', 'Estadística',
+            // Microeconomía
+            'Oferta', 'Demanda', 'Costos', 'Mercado', 'Consumo',
+            // Macroeconomía
+            'PBI', 'Inflación', 'Política Fiscal', 'Crecimiento', 'Inversión',
+            // Contabilidad
+            'Asientos', 'Libro Diario', 'Balance', 'Patrimonio', 'Activo'
+        ];
+
+        // --- DATA DE TEMAS ESPECÍFICOS (Estructura de módulos) ---
+        const topicsData = {
+            'es': {
+                math: [
+                    {
+                        moduleName: "Cálculo I",
+                        topics: [
+                            { name: "Propiedades de cálculo", material: "Material de Repaso Básico" },
+                            { name: "Sistema de ecuaciones", material: "Resolución por Sustitución y Reducción" },
+                            { name: "Tipos de resoluciones", material: "Guía de Métodos Analíticos y Gráficos" },
+                            { name: "Funciones", material: "Clasificación y Características" },
+                            { name: "Estudio de funciones", material: "Análisis de Dominio y Rango" },
+                            { name: "Límite", material: "Conceptos y Propiedades Fundamentales" },
+                            { name: "Continuidad", material: "Ejercicios de Puntos de Discontinuidad" },
+                            { name: "Derivadas", material: "Fórmulas Básicas y Avanzadas" },
+                            { name: "Optimizaciones de una o más variables", material: "Casos Prácticos de Máximos y Mínimos" },
+                            { name: "Aplicaciones económicas de derivadas", material: "Elasticidad, Costo Marginal, Ingreso Marginal" },
+                            { name: "Integrales indefinidas", material: "Tabla de Integrales Comunes" },
+                            { name: "Integrales definidas", material: "Ejemplos de Cálculo de Área" },
+                            { name: "Regla de Barrow", material: "Aplicación y Teorema Fundamental del Cálculo" },
+                            { name: "Sucesiones", material: "Fórmulas de Sucesiones Aritméticas y Geométricas" }
+                        ]
+                    },
+                    {
+                        moduleName: "Álgebra Lineal",
+                        topics: [
+                            { name: "Matrices y Determinantes", material: "Fundamentos y Operaciones" },
+                            { name: "Espacios Vectoriales", material: "Base, Dimensión, Transformaciones" }
+                        ]
+                    },
+                    {
+                        moduleName: "Estadística",
+                        topics: [
+                            { name: "Media, Mediana y Moda", material: "Ejercicios de Tendencia Central" },
+                            { name: "Desviación estándar", material: "Cálculo y Significado" },
+                            { name: "Regresión Lineal", material: "Introducción a Modelos Predictivos" },
+                            { name: "Tablas de Frecuencia", material: "Organización y Visualización de Datos" }
+                        ]
+                    },
+                    {
+                        moduleName: "Matemática Financiera",
+                        topics: [
+                            { name: "Interés Simple y Compuesto", material: "Fórmulas y Ejemplos de Capitalización" },
+                            { name: "Anualidades", material: "Cálculo de Pagos y Ahorros Periódicos" },
+                            { name: "Valor Actual Neto (VAN)", material: "Análisis de Proyectos de Inversión" },
+                            { name: "Tasa Interna de Retorno (TIR)", material: "Decisiones de Inversión y Rentabilidad" }
+                        ]
+                    }
+                ],
+                micro: [
+                    // Se mantiene la estructura simple para otras áreas
+                    { name: "Teoría del Consumidor", material: "Análisis de Curvas de Indiferencia" },
+                    { name: "Estructuras de Mercado", material: "Comparativa de Monopolio y Competencia Perfecta" },
+                    { name: "Elasticidad Precio", material: "Simulador de Elasticidad" },
+                    { name: "Costos de Producción", material: "Plantilla de Costos Fijos y Variables" }
+                ],
+                macro: [
+                    { name: "Modelo IS-LM", material: "Gráficos y Fórmulas del IS-LM" },
+                    { name: "Cuentas Nacionales (PBI)", material: "Métodos de Cálculo del PBI" },
+                    { name: "Inflación y Desempleo (Curva de Phillips)", material: "Artículos sobre la Curva de Phillips" },
+                    { name: "Política Monetaria y Fiscal", material: "Resumen de Herramientas de Política" }
+                ],
+                account: [
+                    { name: "Registro de Asientos (Devengado)", material: "Ejemplo Práctico de Asientos Contables" },
+                    { name: "Estados Contables (Balance)", material: "Esquema del Estado de Situación Financiera" },
+                    { name: "Contabilidad de Costos (Punto de Equilibrio)", material: "Cálculo Interactivo del Punto de Equilibrio" },
+                    { name: "Normas Contables Profesionales", material: "Material de Referencia NIIF" }
+                ]
+            },
+            'en': {
+                math: [
+                    {
+                        moduleName: "Calculus I",
+                        topics: [
+                            { name: "Calculation Properties", material: "Basic Review Material" },
+                            { name: "System of equations", material: "Resolution by Substitution and Reduction" },
+                            { name: "Types of resolutions", material: "Guide to Analytical and Graphical Methods" },
+                            { name: "Functions", material: "Classification and Characteristics" },
+                            { name: "Function Study", material: "Domain and Range Analysis" },
+                            { name: "Limit", material: "Fundamental Concepts and Properties" },
+                            { name: "Continuity", material: "Discontinuity Point Exercises" },
+                            { name: "Derivatives", material: "Basic and Advanced Formulas" },
+                            { name: "Optimization of one or more variables", material: "Practical Cases of Maximums and Minimums" },
+                            { name: "Economic applications of derivatives", material: "Elasticity, Marginal Cost, Marginal Revenue" },
+                            { name: "Indefinite integrals", material: "Table of Common Integrals" },
+                            { name: "Definite integrals", material: "Examples of Area Calculation" },
+                            { name: "Barrow's Rule", material: "Application and Fundamental Theorem of Calculus" },
+                            { name: "Sequences", material: "Formulas for Arithmetic and Geometric Sequences" }
+                        ]
+                    },
+                    {
+                        moduleName: "Linear Algebra",
+                        topics: [
+                            { name: "Matrices and Determinants", material: "Fundamentals and Operations" },
+                            { name: "Vector Spaces", material: "Base, Dimension, Transformations" }
+                        ]
+                    },
+                    {
+                        moduleName: "Statistics",
+                        topics: [
+                            { name: "Mean, Median, and Mode", material: "Central Tendency Exercises" },
+                            { name: "Standard Deviation", material: "Calculation and Meaning" },
+                            { name: "Linear Regression", material: "Introduction to Predictive Models" },
+                            { name: "Frequency Tables", material: "Data Organization and Visualization" }
+                        ]
+                    },
+                    {
+                        moduleName: "Financial Mathematics",
+                        topics: [
+                            { name: "Simple and Compound Interest", material: "Capitalization Formulas and Examples" },
+                            { name: "Annuities", material: "Calculation of Periodic Payments and Savings" },
+                            { name: "Net Present Value (NPV)", material: "Investment Project Analysis" },
+                            { name: "Internal Rate of Return (IRR)", material: "Investment and Profitability Decisions" }
+                        ]
+                    }
+                ]
+                ,
+                micro: [
+                    { name: "Consumer Theory", material: "Indifference Curve Analysis" },
+                    { name: "Market Structures", material: "Comparison of Monopoly and Perfect Competition" },
+                    { name: "Price Elasticity", material: "Elasticity Simulator" },
+                    { name: "Production Costs", material: "Fixed and Variable Costs Template" }
+                ],
+                macro: [
+                    { name: "IS-LM Model", material: "IS-LM Graphs and Formulas" },
+                    { name: "National Accounts (GDP)", material: "GDP Calculation Methods" },
+                    { name: "Inflation and Unemployment (Phillips Curve)", material: "Articles on the Phillips Curve" },
+                    { name: "Monetary and Fiscal Policy", material: "Summary of Policy Tools" }
+                ],
+                account: [
+                    { name: "Journal Entries (Accrual)", material: "Practical Example of Journal Entries" },
+                    { name: "Financial Statements (Balance Sheet)", material: "Financial Position Statement Outline" },
+                    { name: "Cost Accounting (Break-Even Point)", material: "Interactive Break-Even Point Calculation" },
+                    { name: "Professional Accounting Standards", material: "IFRS Reference Material" }
+                ]
+            }
+        };
+
+        // --- LÓGICA PARA INYECTAR MARCAS DE AGUA ALEATORIAS ---
+        function generateHeaderWatermarks() {
+            const container = document.getElementById('header-watermark-bg');
+            container.innerHTML = ''; 
+
+            const totalWatermarks = 15;
+            
+            for (let i = 0; i < totalWatermarks; i++) {
+                const keyword = watermarkKeywords[Math.floor(Math.random() * watermarkKeywords.length)];
+                
+                const wm = document.createElement('span');
+                wm.textContent = keyword;
+                wm.classList.add('watermark-item');
+                
+                const top = Math.random() * 90;
+                const left = Math.random() * 90;
+                const rotation = Math.random() * 60 - 30; 
+
+                wm.style.top = `${top}%`;
+                wm.style.left = `${left}%`;
+                wm.style.transform = `rotate(${rotation}deg)`;
+                
+                container.appendChild(wm);
+            }
+        }
+
+
+        // --- DATA DE TRADUCCIONES ESTATICAS ---
+        const translations = {
+            'es': {
+                title: 'Academia JN',
+                subtitle: 'Clases personalizada para el éxito escolar - académico.',
+                ubaCredential: 'Somos profesionales formados en la Facultad de Ciencias Económicas de la UBA.', 
+                areaTitle: 'Nuestras Áreas de Enseñanza',
+                mathTitle: 'Matemáticas',
+                microTitle: 'Microeconomía',
+                macroTitle: 'Macroeconomía',
+                accountTitle: 'Contabilidad',
+                formTitle: 'Solicita tu Clase o Consulta',
+                formNameLabel: 'Tu Nombre Completo',
+                formTopicLabel: 'Tema/Materia que Necesitas',
+                selectOption: 'Selecciona una opción',
+                topicMath: 'Matemáticas',
+                topicMicro: 'Microeconomía',
+                topicMacro: 'Macroeconomía',
+                topicAccount: 'Teoría Contable',
+                topicOther: 'Otro (Especificar en mensaje)',
+                formLevelLabel: 'Mi nivel es:...',
+                selectLevel: 'Selecciona el nivel',
+                levelPrimary: 'Primario',
+                levelSecondary: 'Secundario',
+                levelTertiary: 'Terciario',
+                levelUniversity: 'Universitario',
+                formMessageLabel: 'Mensaje y Detalles Adicionales',
+                formMessagePlaceholder: 'Ej: Necesito ayuda con "Integrales Definidas".',
+                sendButton: 'Enviar Solicitud',
+                promoTitle: 'Tu Código Promoción',
+                promoDesc: 'Ingresa este código para aplicar tu descuento o promoción.',
+                copySuccess: '¡Código copiado!',
+                contactTitle: 'Contactos Directos (WhatsApp):',
+                footerText: 'Hecho para tus clases particulares. (La información enviada no se almacena, es un ejemplo funcional).',
+                successMessage: '✅ ¡Tu solicitud ha sido enviada con éxito! Te contactaré pronto.',
+                // Nuevas traducciones para el modal
+                materialModalTitle: 'Material Solicitado',
+                materialModalDesc: 'Aquí se simula la entrega o visualización del material.',
+                materialSimNote: '(Nota: Esto es solo un ejemplo simulado, el material real se entrega en clase).',
+                materialModalClose: 'Cerrar',
+                topicNameLabel: 'Tema Seleccionado:'
+            },
+            'en': {
+                title: 'JN Academy',
+                subtitle: 'Personalized classes for academic success.',
+                ubaCredential: 'We are professionals graduated from the Faculty of Economic Sciences (UBA).', 
+                areaTitle: 'Our Teaching Areas',
+                mathTitle: 'Mathematics',
+                microTitle: 'Microeconomics',
+                macroTitle: 'Macroeconomics',
+                accountTitle: 'Accounting',
+                formTitle: 'Request your Class or Inquiry',
+                formNameLabel: 'Your Full Name',
+                formTopicLabel: 'Subject/Topic Needed',
+                selectOption: 'Select an option',
+                topicMath: 'Mathematics',
+                topicMicro: 'Microeconomics',
+                topicMacro: 'Macroeconomics',
+                topicAccount: 'Accounting Theory',
+                topicOther: 'Other (Specify in message)',
+                formLevelLabel: 'My level is:...',
+                selectLevel: 'Select level',
+                levelPrimary: 'Primary',
+                levelSecondary: 'Secondary',
+                levelTertiary: 'Tertiary',
+                levelUniversity: 'University',
+                formMessageLabel: 'Message and Additional Details',
+                formMessagePlaceholder: 'Ex: I need help with "Definite Integrals".',
+                sendButton: 'Send Request',
+                promoTitle: 'Your Promo Code',
+                promoDesc: 'Enter this code to apply your discount or promotion.',
+                copySuccess: 'Code copied!',
+                contactTitle: 'Direct Contacts (WhatsApp):',
+                footerText: 'Made for your private lessons. (Data sent is not stored, this is a functional example).',
+                successMessage: '✅ Your request has been sent successfully! We will contact you soon.',
+                // Nuevas traducciones para el modal
+                materialModalTitle: 'Material Requested',
+                materialModalDesc: 'This simulates the delivery or viewing of the material.',
+                materialSimNote: '(Note: This is only a simulated example, the real material is delivered in class).',
+                materialModalClose: 'Close',
+                topicNameLabel: 'Selected Topic:'
+            }
+        };
+
+        // --- LÓGICA DEL ACORDEÓN ANIDADO (Nuevo) ---
+
+        // Maneja la apertura/cierre de un MÓDULO (Ej: Cálculo I)
+        function handleModuleClick(moduleId) {
+            const container = document.getElementById(`module-${moduleId}-topics`);
+            const header = document.getElementById(`module-${moduleId}-header`);
+
+            // Si ya está abierto, ciérralo
+            if (container.classList.contains('open')) {
+                container.classList.remove('open');
+                header.classList.remove('open');
+                header.setAttribute('aria-expanded', 'false');
+            } else {
+                // Abre el seleccionado
+                container.classList.add('open');
+                header.classList.add('open');
+                header.setAttribute('aria-expanded', 'true');
+            }
+        }
+        
+        // Genera el HTML de la lista de módulos para un área específica
+        function renderTopicsList(areaId, lang) {
+            const data = topicsData[lang][areaId];
+
+            // FIX: Guardián para evitar TypeError: si el área de datos no existe o no es un array, retornar vacío.
+            if (!data || !Array.isArray(data)) {
+                console.error(`Error de datos: topicsData[${lang}][${areaId}] no es un array o está indefinido.`);
+                return '';
+            }
+
+            // Si el área NO es 'math', asumimos que es una lista plana (Micro, Macro, Contabilidad).
+            if (areaId !== 'math') {
+                let html = '<ul class="space-y-2">';
+                data.forEach(topic => {
+                     // Seguridad extra: verificar que el objeto topic tenga las propiedades necesarias.
+                     if (topic.name && topic.material) {
+                         html += `<li><button class="topic-button" onclick="handleTopicClick('${topic.name.replace(/'/g, "\\'")}', '${topic.material.replace(/'/g, "\\'")}')">
+                            <span class="font-semibold">${topic.name}</span>: <span class="text-gray-600">${topic.material}</span>
+                         </button></li>`;
+                     }
+                });
+                html += '</ul>';
+                return html;
+            }
+            
+            // Lógica para Áreas con Módulos Anidados (Ej: Matemáticas)
+            let html = '';
+            data.forEach((module, index) => {
+                const moduleId = `${areaId}-${index}`;
+                
+                // 1. Module Header Button (Cálculo I, Álgebra Lineal, etc.)
+                html += `<div id="module-${moduleId}-header" onclick="handleModuleClick('${moduleId}')" class="module-header mt-4" role="button" aria-expanded="false" aria-controls="module-${moduleId}-topics">
+                            <span>${module.moduleName}</span>
+                            <svg class="w-5 h-5 ml-2 text-primary arrow-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
+                        </div>`;
+                
+                // 2. Topics Container for the Module
+                html += `<div id="module-${moduleId}-topics" class="module-topics-container">
+                            <ul class="space-y-1">`;
+                
+                // 3. Render the specific topics inside the module
+                if (Array.isArray(module.topics)) { // Seguridad extra para el array de temas anidado
+                    module.topics.forEach(topic => {
+                        html += `<li><button class="topic-button text-sm" onclick="handleTopicClick('${topic.name.replace(/'/g, "\\'")}', '${topic.material.replace(/'/g, "\\'")}')">
+                                    <span class="font-medium text-gray-700">${topic.name}</span>: <span class="text-xs text-gray-500">${topic.material}</span>
+                                 </button></li>`;
+                    });
+                }
+                
+                html += `   </ul>
+                         </div>`;
+            });
+
+            return html;
+        }
+
+
+        // Maneja la acción de colapsar/expandir el contenido de un área (Primer nivel)
+        function handleAreaClick(areaId) {
+            const container = document.getElementById(`topics-${areaId}`);
+            const header = container.previousElementSibling; // Es el div con la clase area-header
+
+            // Si ya está abierto, ciérralo
+            if (container.classList.contains('open')) {
+                container.classList.remove('open');
+                header.classList.remove('open');
+                header.setAttribute('aria-expanded', 'false');
+            } else {
+                // 1. Cerrar todos los demás
+                document.querySelectorAll('.topics-list-container.open').forEach(openContainer => {
+                    openContainer.classList.remove('open');
+                    openContainer.previousElementSibling.classList.remove('open');
+                    openContainer.previousElementSibling.setAttribute('aria-expanded', 'false');
+                    
+                    // Asegurar que los módulos anidados también se cierren al cerrar el área principal
+                    openContainer.querySelectorAll('.module-topics-container.open').forEach(moduleContainer => {
+                        moduleContainer.classList.remove('open');
+                        moduleContainer.previousElementSibling.classList.remove('open');
+                        moduleContainer.previousElementSibling.setAttribute('aria-expanded', 'false');
+                    });
+                });
+                
+                // 2. Abrir el seleccionado
+                container.classList.add('open');
+                header.classList.add('open');
+                header.setAttribute('aria-expanded', 'true');
+            }
+        }
+        
+        // Muestra el modal simulando la entrega del material (Tercer nivel)
+        function handleTopicClick(topicName, material) {
+            const modal = document.getElementById('material-modal');
+            const topicDisplay = document.getElementById('modal-topic-name');
+            const materialDisplay = document.getElementById('modal-material-details');
+
+            // Actualiza el contenido del modal
+            topicDisplay.textContent = `${translations[currentLang]['topicNameLabel']} ${topicName}`;
+            materialDisplay.textContent = material;
+            
+            // Muestra el modal
+            modal.style.display = 'flex';
+        }
+
+        // Cierra el modal
+        function closeModal() {
+            document.getElementById('material-modal').style.display = 'none';
+        }
+
+
+        // --- LÓGICA DE LA FRASE MOTIVACIONAL (Aleatoria) ---
+        function updateMotivationalPhrase(lang) {
+            const list = phrasesData[lang];
+            const randomIndex = Math.floor(Math.random() * list.length);
+            const selectedPhrase = list[randomIndex];
+
+            const phraseElement = document.getElementById('phrase-text');
+            const authorElement = document.getElementById('phrase-author');
+            
+            const highlightClasses = 'font-bold text-gray-900 bg-primary/10 px-2 py-1 rounded-lg';
+
+            const styledText = selectedPhrase.text.replace(/<span class="highlighted-word">(.*?)<\/span>/g, 
+                `<span class="${highlightClasses}"><br class="hidden sm:inline" />$1</span>`);
+            
+            phraseElement.innerHTML = `"${styledText}"`;
+            authorElement.textContent = `— ${selectedPhrase.author}`;
+        }
+
+
+        // --- LÓGICA DE TRADUCCIÓN ESTATICA ---
+        function applyTranslation(lang) {
+            document.querySelectorAll('[data-text-key]').forEach(element => {
+                const key = element.getAttribute('data-text-key');
+                if (translations[lang] && translations[lang][key]) {
+                    
+                    if (element.tagName === 'INPUT' || element.tagName === 'TEXTAREA') {
+                        element.placeholder = translations[lang][key];
+                    } else {
+                        element.textContent = translations[lang][key];
+                    }
+                }
+            });
+
+            // Actualiza opciones de Select
+            document.getElementById('topic').querySelector('[value=""]').textContent = translations[lang]['selectOption'];
+            document.getElementById('difficulty').querySelector('[value=""]').textContent = translations[lang]['selectLevel'];
+            
+            // Re-renderiza el contenido dinámico de los acordeones para el nuevo idioma
+            document.querySelectorAll('[data-area-id]').forEach(card => {
+                const areaId = card.getAttribute('data-area-id');
+                const container = document.getElementById(`topics-${areaId}`);
+                container.innerHTML = renderTopicsList(areaId, lang);
+            });
+            
+            // Asegurar que el modal se actualice si está visible
+            document.getElementById('modal-material-details').textContent = translations[lang]['materialModalDesc'];
+            document.querySelector('[data-text-key="materialModalTitle"]').textContent = translations[lang]['materialModalTitle'];
+            document.querySelector('[data-text-key="materialSimNote"]').textContent = translations[lang]['materialSimNote'];
+            document.querySelector('[data-text-key="materialModalClose"]').textContent = translations[lang]['materialModalClose'];
+        }
+
+        function toggleLanguage() {
+            currentLang = currentLang === 'es' ? 'en' : 'es';
+            applyTranslation(currentLang);
+            updateMotivationalPhrase(currentLang); 
+            document.getElementById('current-lang-text').textContent = currentLang.toUpperCase();
+        }
+
+        // --- LÓGICA DE WHATSAPP ---
+        function setupWhatsAppLinks() {
+            const getWaMessage = (lang) => {
+                const message = lang === 'es' 
+                    ? "Hola Academia JN, quisiera solicitar una clase particular. Mi nombre es [Tu Nombre] y necesito ayuda con [Materia/Tema]."
+                    : "Hello JN Academy, I would like to request a private class. My name is [Your Name] and I need help with [Subject/Topic].";
+                return encodeURIComponent(message);
+            };
+
+            const updateLinks = (lang) => {
+                 // Julio
+                document.getElementById('wa-julio').href = `https://wa.me/5491123985041?text=${getWaMessage(lang)}`;
+                // Naty
+                document.getElementById('wa-naty').href = `https://wa.me/5491122556787?text=${getWaMessage(lang)}`;
+            }
+
+            updateLinks(currentLang);
+
+            document.getElementById('lang-toggle').addEventListener('click', () => {
+                updateLinks(currentLang);
+            });
+        }
+
+        // --- LÓGICA PRINCIPAL AL CARGAR LA PÁGINA ---
+        window.onload = function() {
+            // 1. Generar las marcas de agua
+            generateHeaderWatermarks();
+
+            // 2. Aplicar la traducción inicial, lo que también renderiza los temas del acordeón.
+            applyTranslation(currentLang);
+            
+            // 3. Configurar enlaces de WhatsApp
+            setupWhatsAppLinks();
+
+            // 4. Generar y mostrar el Código Promoción
+            document.getElementById('student-code-display').textContent = generateStudentCode();
+
+            // 5. Seleccionar y mostrar la frase motivacional aleatoria
+            updateMotivationalPhrase(currentLang);
+        };
+
+
+        // --- LÓGICA DE FORMULARIO Y CÓDIGO (Mantenida) ---
+
+        function generateStudentCode() {
+            const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            let code = '';
+            for (let i = 0; i < 6; i++) {
+                code += characters.charAt(Math.floor(Math.random() * characters.length));
+            }
+            return code;
+        }
+
+        document.getElementById('contact-form').addEventListener('submit', function(event) {
+            event.preventDefault(); 
+
+            const form = event.target;
+            const formData = new FormData(form);
+            const statusMessage = document.getElementById('status-message');
+            const successText = translations[currentLang]['successMessage'];
+
+            const data = {
+                name: formData.get('name'),
+                topic: formData.get('topic'),
+                difficulty: formData.get('difficulty'),
+                message: formData.get('message')
+            };
+
+            console.log('Solicitud enviada (simulada):', data);
+
+            statusMessage.textContent = successText;
+            statusMessage.classList.remove('hidden', 'bg-red-100', 'text-red-700');
+            statusMessage.classList.add('bg-green-100', 'text-green-700');
+            form.reset(); 
+            
+            setTimeout(() => {
+                statusMessage.classList.add('hidden');
+            }, 5000);
+        });
+        
+        const codeDisplay = document.getElementById('student-code-display');
+        const copyMessage = document.getElementById('copy-message');
+
+        codeDisplay.addEventListener('click', () => {
+            function copyToClipboard(text) {
+                const tempInput = document.createElement('textarea');
+                tempInput.value = text;
+                document.body.appendChild(tempInput);
+                tempInput.select();
+                try {
+                    document.execCommand('copy');
+                    copyMessage.textContent = translations[currentLang]['copySuccess'];
+                    copyMessage.classList.remove('hidden');
+                    setTimeout(() => {
+                        copyMessage.classList.add('hidden');
+                    }, 2000); 
+                } catch (err) {
+                    console.error('No se pudo copiar el texto: ', err);
+                }
+                document.body.removeChild(tempInput);
+            }
+            copyToClipboard(codeDisplay.textContent);
+        });
+
+        setInterval(() => {
+            codeDisplay.textContent = generateStudentCode();
+        }, 3600000); 
+        
+    </script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
